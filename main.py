@@ -1,61 +1,100 @@
+import networkx as nx
 from graph import campus_graph
-from shortest_path import dijkstra, get_shortest_path
-from span_tree import prim_mst
-from string_matching import search_buildings
-import heapq
+from shortest_path import dijkstra
+from task_scheduler import activity_selection
+from string_matching import kmp_search
 
 def display_shortest_path():
-    print("\n--- Shortest Path ---")
-    start = input("Enter the start building code (e.g., PL, TSU, H): ").strip().upper()
-    end = input("Enter the destination building code (e.g., PL, TSU, H): ").strip().upper()
-
-    # Create campus graph
-    G = campus_graph()
-
-    # Run Dijkstra's algorithm to find the shortest path
-    distances, predecessors = dijkstra(G, start)
-    if distances[end] == float('inf'):
-        print(f"No path found from {start} to {end}.")
+    # Get input for current location and destination
+    start_location = input("Enter current location (building name): ")
+    end_location = input("Enter desired destination (building name): ")
+    
+    # Get the campus graph
+    graph = campus_graph()
+    
+    # Find the shortest path
+    path, distance = dijkstra(graph, start_location, end_location)
+    
+    if path:
+        print(f"Shortest path from {start_location} to {end_location}:")
+        print(" -> ".join(path))
+        print(f"Path distance: {distance}")
     else:
-        path = get_shortest_path(predecessors, start, end)
-        print(f"Shortest path from {start} to {end}: {' -> '.join(path)}")
-        print(f"Path distance: {distances[end]}")
+        print(f"No path found between {start_location} and {end_location}")
 
+def schedule_tasks():
+    # Get input for tasks
+    num_tasks = int(input("Enter the number of tasks: "))
+    activities = []
+    
+    for _ in range(num_tasks):
+        name = input("Enter task name: ")
+        start = int(input(f"Enter start time for {name}: "))
+        end = int(input(f"Enter end time for {name}: "))
+        activities.append({"name": name, "start": start, "end": end})
+    
+    # Select non-overlapping tasks using the Activity Selection Problem
+    selected_tasks = activity_selection(activities)
+    
+    print("\nSelected non-overlapping tasks:")
+    for task in selected_tasks:
+        print(f"{task['name']} (Start: {task['start']}, End: {task['end']})")
 
-def search_for_buildings():
-    print("\n--- Search for Buildings ---")
-    query = input("Enter part of the building name to search: ").strip()
-    matches = search_buildings(query)
+def search_building():
+    # Get input for building search
+    text = "PL MH TSU H GH CS E KHS LH ENPNS NPS SCPS"  # Example campus buildings list
+    pattern = input("Enter building name or room number to search for: ")
+
+    # Perform KMP search
+    matches = kmp_search(text, pattern)
     
     if matches:
-        print("Found the following buildings:")
-        for code, name in matches:
-            print(f"{code}: {name}")
+        print(f"Found '{pattern}' at positions: {matches}")
     else:
-        print("No buildings found.")
+        print(f"'{pattern}' not found in the building list.")
 
+def sort_tasks():
+    # Get input for sorting tasks
+    num_tasks = int(input("Enter the number of tasks: "))
+    activities = []
+    
+    for _ in range(num_tasks):
+        name = input("Enter task name: ")
+        start = int(input(f"Enter start time for {name}: "))
+        end = int(input(f"Enter end time for {name}: "))
+        activities.append({"name": name, "start": start, "end": end})
+    
+    # Sort tasks by start time 
+    activities.sort(key=lambda x: x["start"])
+
+    print("\nSorted tasks by start time:")
+    for task in activities:
+        print(f"{task['name']} (Start: {task['start']}, End: {task['end']})")
 
 def main():
     while True:
-        print("\n--- Smart Campus Navigation & Task Scheduler ---")
-        print("1. Find shortest path between buildings")
-        print("2. Task Scheduler")
-        print("3. Search for buildings")
-        print("4. Exit")
-
-        choice = input("Enter your choice (1-4): ")
-
-        if choice == '1':
+        print("\nWelcome to the Smart Campus Navigation and Task Scheduler!")
+        print("1. Find the shortest path between two buildings")
+        print("2. Schedule tasks")
+        print("3. Search for a building")
+        print("4. Sort tasks by priority or time")
+        print("5. Exit")
+        
+        choice = input("Enter your choice (1-5): ")
+        
+        if choice == "1":
             display_shortest_path()
-        elif choice == '2':
-            task_scheduler()
-        elif choice == '3':
-            search_for_buildings()
-        elif choice == '4':
-            print("Exiting the program.")
+        elif choice == "2":
+            schedule_tasks()
+        elif choice == "3":
+            search_building()
+        elif choice == "4":
+            sort_tasks()
+        elif choice == "5":
+            print("Goodbye!")
             break
         else:
-            print("Invalid choice. Please select a valid option.")
+            print("Invalid choice! Please try again.")
 
 if __name__ == "__main__":
     main()

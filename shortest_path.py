@@ -1,34 +1,43 @@
-import heapq
+# Dev: Alex I
+#
+# Dijkstra's algorithm
+# shortest path between two buildings  
+#
 
-def dijkstra(graph, start):
-    # Priority queue: (distance, node)
-    queue = [(0, start)]
+def dijkstra(graph, start, end):
+    import heapq  # For priority queue
+
+    # Priority queue to hold (distance, node)
+    queue = [(0, start)] 
     distances = {node: float('inf') for node in graph.nodes}
     distances[start] = 0
-    predecessors = {node: None for node in graph.nodes}
+    previous_nodes = {}
 
     while queue:
         current_distance, current_node = heapq.heappop(queue)
 
-        # Iterate over neighbors using networkx graph methods
+        # Stop if we reached destination
+        if current_node == end:
+            break
+
+        # Explore neighbors
         for neighbor in graph.neighbors(current_node):
             weight = graph[current_node][neighbor]['weight']
             distance = current_distance + weight
 
+            # If found a shorter path to neighbor, update distances and previous nodes
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
-                predecessors[neighbor] = current_node
+                previous_nodes[neighbor] = current_node
                 heapq.heappush(queue, (distance, neighbor))
 
-    return distances, predecessors
-
-def get_shortest_path(predecessors, start, end):
+    # Reconstruct the shortest path, if it exists
     path = []
     current = end
-    while current != start:
-        path.append(current)
-        current = predecessors[current]
-        if current is None:
-            return []  # No path
-    path.append(start)
-    return path[::-1]
+    while current in previous_nodes:
+        path.insert(0, current)
+        current = previous_nodes[current]
+    if path:
+        path.insert(0, start)
+
+    return path, distances[end]
