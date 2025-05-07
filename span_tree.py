@@ -1,3 +1,7 @@
+#
+# Output of the full Spanning Tree of graph.py
+#
+
 import heapq
 from graph import campus_graph
 
