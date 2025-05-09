@@ -3,11 +3,8 @@
 # gui to display campus map
 
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, scrolledtext
 from PIL import Image, ImageTk, ImageDraw
-import networkx as nx
-import matplotlib.pyplot as plt
-import io
 from graph import campus_graph
 from shortest_path import dijkstra
 from string_matching import kmp_search
@@ -15,6 +12,32 @@ from task_scheduler import run_scheduler
 
 # --- Global Graph Initialization ---
 G, building_names = campus_graph()
+
+# Define building coordinates (update these to match the actual positions on the map)
+building_coords = {
+    "PL": (437, 277),
+    "MH": (438, 493),
+    "TSU": (105, 210),
+    "H": (556, 388),
+    "GH": (562, 482),
+    "CS": (735, 155),
+    "E": (675, 155),
+    "KHS": (345, 102),
+    "LH": (503, 570),
+    "ENPNS": (792, 372),
+    "NPS": (77, 552),
+    "SCPS": (77, 49),
+    "B": (285, 194),
+    "I": (685, 250),
+    "EC": (537, 261),
+    "VA": (44, 362),
+    "TG": (398, 33),
+    "SHCC": (561, 69),
+    "GAS": (835, 36),
+    "GC": (265, 504),
+    "DBH": (385, 570),
+    "F": (200, 46)
+}
 
 # --- Helper Functions ---
 def draw_path(path):
@@ -37,7 +60,7 @@ def draw_path(path):
     plt.close()
     return Image.open(buf)
 
-def find_building_matches(user_input):
+def find_building_matches(user_input, building_names):
     buildings = list(G.nodes)
     matches = [b for b in buildings if kmp_search(b.lower(), user_input.lower())]
 
@@ -45,6 +68,9 @@ def find_building_matches(user_input):
     for acronym, full_name in building_names.items():
         if kmp_search(full_name.lower(), user_input.lower()):
             matches.append(acronym)
+
+    # Remove duplicates
+    matches = list(set(matches))
 
     return matches
 
@@ -54,25 +80,50 @@ class CampusNavigator:
         self.root = root
         root.title("Campus Navigator")
 
+        # Main layout
+        self.main_frame = tk.Frame(root)
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Left Frame for Map
+        self.map_frame = tk.Frame(self.main_frame)
+        self.map_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Right Frame for Controls
+        self.control_frame = tk.Frame(self.main_frame)
+        self.control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
+
         # Load static map image
         self.map_image = Image.open("campus_map.png")
         self.tk_map = ImageTk.PhotoImage(self.map_image)
-        self.canvas = tk.Canvas(root, width=self.map_image.width, height=self.map_image.height)
+        self.canvas = tk.Canvas(self.map_frame, width=self.map_image.width, height=self.map_image.height)
         self.canvas.create_image(0, 0, anchor="nw", image=self.tk_map)
         self.canvas.pack()
 
-        # Buttons
-        button_frame = tk.Frame(root)
-        button_frame.pack()
+        # Find Shortest Path
+        tk.Label(self.control_frame, text="Start Building:").pack(anchor="w", pady=(10, 0))
+        self.start_entry = tk.Entry(self.control_frame)
+        self.start_entry.pack(fill="x", pady=5)
 
-        tk.Button(button_frame, text="Schedule Tasks", command=self.schedule_tasks).pack(side="left")
-        tk.Button(button_frame, text="Search for Building", command=self.search_building).pack(side="left")
-        tk.Button(button_frame, text="Find Shortest Path", command=self.shortest_path_ui).pack(side="left")
+        tk.Label(self.control_frame, text="End Building:").pack(anchor="w", pady=(0, 10))
+        self.end_entry = tk.Entry(self.control_frame)
+        self.end_entry.pack(fill="x", pady=5)
+
+        tk.Button(self.control_frame, text="Find Shortest Path", command=self.shortest_path_ui).pack(fill="x", pady=20)
+
+        # Search for Building
+        tk.Label(self.control_frame, text="Search for Building:").pack(anchor="w", pady=(10, 0))
+        self.search_entry = tk.Entry(self.control_frame)
+        self.search_entry.pack(fill="x", pady=5)
+        tk.Button(self.control_frame, text="Search", command=self.search_building).pack(fill="x", pady=20)
+
+        # Schedule Tasks
+        tk.Button(self.control_frame, text="Schedule Tasks", command=self.schedule_tasks).pack(fill="x", pady=20)
 
     def schedule_tasks(self):
         popup = tk.Toplevel(self.root)
         popup.title("Task Scheduler")
         popup.attributes("-topmost", True)
+        popup.geometry("300x250")  # Set a larger size for the popup window
 
         tasks = []
 
@@ -119,17 +170,35 @@ class CampusNavigator:
         tk.Button(popup, text="Schedule", command=show_schedule).pack()
 
     def search_building(self):
-        query = simpledialog.askstring("Building Search", "Enter building code or part of it:")
+        query = self.search_entry.get()
         if query:
-            matches = find_building_matches(query)
+            matches = find_building_matches(query, building_names)
             if matches:
                 messagebox.showinfo("Matches", ", ".join(matches))
+                # Highlight the first match on the map
+                self.highlight_building_on_map(matches[0])
             else:
                 messagebox.showinfo("No Matches", "No buildings matched that search.")
 
+    def highlight_building_on_map(self, building_code):
+        # Load the map image
+        map_image = Image.open("campus_map.png")
+        draw = ImageDraw.Draw(map_image)
+
+        # Get the coordinates for the building
+        coord = building_coords.get(building_code)
+        if coord:
+            # Draw a marker at the building's location
+            draw.ellipse((coord[0]-10, coord[1]-10, coord[0]+10, coord[1]+10), fill="red")
+
+        # Display the map with the highlighted building
+        self.tk_map = ImageTk.PhotoImage(map_image)
+        self.canvas.create_image(0, 0, anchor="nw", image=self.tk_map)
+        self.canvas.image = self.tk_map  # Keep a reference to avoid garbage collection
+
     def shortest_path_ui(self):
-        start = simpledialog.askstring("Path Start", "Enter starting building code:")
-        end = simpledialog.askstring("Path End", "Enter destination building code:")
+        start = self.start_entry.get()
+        end = self.end_entry.get()
 
         if start not in G.nodes or end not in G.nodes:
             messagebox.showerror("Error", "One or both buildings not found in graph.")
@@ -151,32 +220,6 @@ class CampusNavigator:
         map_image = Image.open("campus_map.png")
         draw = ImageDraw.Draw(map_image)
 
-        # Define building coordinates
-        building_coords = {
-            "PL": (437, 277),
-            "MH": (438, 493),
-            "TSU": (105, 210),
-            "H": (556, 388),
-            "GH": (562, 482),
-            "CS": (735, 155),
-            "E": (675, 155),
-            "KHS": (345, 102),
-            "LH": (503, 570),
-            "ENPNS": (792, 372),
-            "NPS": (77, 552),
-            "SCPS": (77, 49),
-            "B": (285, 194),
-            "I": (685, 250),
-            "EC": (537, 261),
-            "VA": (44, 362),
-            "TG": (398, 33),
-            "SHCC": (561, 69),
-            "GAS": (835, 36),
-            "GC": (265, 504),
-            "DBH": (385, 570),
-            "F": (200, 46)
-        }
-
         # Debug: Print the path and coordinates
         print("Path:", path)
         for i in range(len(path) - 1):
@@ -196,7 +239,19 @@ class CampusNavigator:
         self.canvas.create_image(0, 0, anchor="nw", image=self.tk_map)
         self.canvas.image = self.tk_map  # Keep a reference to avoid garbage collection
 
+    def show_custom_popup(self, title, message):
+        popup = tk.Toplevel(self.root)
+        popup.title(title)
+        popup.geometry("500x400")  # Set the size of the pop-up window
+        popup.attributes("-topmost", True)  # Ensure the pop-up stays on top
 
+        text_area = scrolledtext.ScrolledText(popup, wrap=tk.WORD, width=50, height=20)
+        text_area.insert(tk.INSERT, message)
+        text_area.pack(padx=10, pady=10)
+        text_area.config(state=tk.DISABLED)  # Make the text area read-only
+
+        button = tk.Button(popup, text="OK", command=popup.destroy)
+        button.pack(pady=10)
 
 # --- Time Utilities ---
 def parse_time_input(time_str):
@@ -228,4 +283,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = CampusNavigator(root)
     root.mainloop()
-
