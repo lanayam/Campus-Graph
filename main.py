@@ -1,4 +1,4 @@
-#Dev: Alex I
+#Dev: Alex I and Lizabeth
 #
 # main file to test everything is working correctly.
 #
