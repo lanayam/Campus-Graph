@@ -71,4 +71,21 @@ def campus_graph():
     G.add_edge("NPS", "ENPNS", weight=3)
     G.add_edge("KHS", "SCPS", weight=4)
 
+    G.add_edge("TSU", "H", weight=3)
+    G.add_edge("TSU", "GH", weight=2)
+    G.add_edge("MH", "H", weight=3)
+    G.add_edge("MH", "KHS", weight=4)
+    G.add_edge("GH", "KHS", weight=3)
+    G.add_edge("GH", "CS", weight=3)
+    G.add_edge("H", "CS", weight=4)
+    G.add_edge("H", "E", weight=3)
+    G.add_edge("KHS", "E", weight=4)
+    G.add_edge("KHS", "LH", weight=3)
+    G.add_edge("LH", "SCPS", weight=3)
+    G.add_edge("ENPNS", "SCPS", weight=4)
+    G.add_edge("NPS", "SCPS", weight=3)
+    G.add_edge("NPS", "GH", weight=4)
+    G.add_edge("SCPS", "GH", weight=3)
+    G.add_edge("SCPS", "MH", weight=4)
+
     return G, building_names

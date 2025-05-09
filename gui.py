@@ -36,7 +36,7 @@ building_coords = {
     "GAS": (835, 36),
     "GC": (265, 504),
     "DBH": (385, 570),
-    "F": (200, 46)
+    "F": (686, 396)
 }
 
 # --- Helper Functions ---
