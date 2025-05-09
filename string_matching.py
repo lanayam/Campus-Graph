@@ -42,10 +42,3 @@ def kmp_search(text, pattern):
             else:
                 i += 1
     return result
-
-# --- Test Case ---
-if __name__ == "__main__":
-    campus_text = "Pollak Library, McCarthy Hall, TSU, Humanities, Gordon Hall, Computer Science"
-    query = "Science"
-    positions = kmp_search(campus_text, query)
-    print(f"'{query}' found at positions: {positions}")
