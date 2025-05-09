@@ -123,7 +123,7 @@ class CampusNavigator:
         popup = tk.Toplevel(self.root)
         popup.title("Task Scheduler")
         popup.attributes("-topmost", True)
-        popup.geometry("300x250")  # Set a larger size for the popup window
+        popup.geometry("300x250")  # Size for the popup window
 
         tasks = []
 
