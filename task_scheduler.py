@@ -19,9 +19,4 @@ def activity_selection(activities):
 # Function combines sorting & scheduling
 def run_scheduler(activities, key="end"):
     sorted_tasks = quick_sort(activities, key)
-<<<<<<< HEAD
     return activity_selection(sorted_tasks)
-
-=======
-    return activity_selection(sorted_tasks)
->>>>>>> testbranch2
