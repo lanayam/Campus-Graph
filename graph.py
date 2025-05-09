@@ -20,16 +20,16 @@ def campus_graph():
         "ENPNS": "Eastside North & South Parking Structure",
         "NPS": "Nutwood Parking Structure",
         "SCPS": "State College Parking Structure",
-        "B": "Becker Amphitheater",
-        "I": "Information Technology Building",
+        "B": "Book Store",
+        "I": "Parking Lot 1",
         "EC": "Education Classroom Building",
         "VA": "Visual Arts Building",
-        "TG": "Tuffy Lawn",
+        "TG": "Titan Gym",
         "SHCC": "Student Health and Counseling Center",
         "GAS": "Gas Station",
         "GC": "Green House Complex",
         "DBH": "Dan Black Hall",
-        "F": "Fitness Center"
+        "F": "Parking Lot 2"
     }
 
     # Add edges with updated weights
@@ -45,15 +45,15 @@ def campus_graph():
     G.add_edge("PL", "NPS", weight=4)        # Pollak Library to Nutwood Parking Structure
     G.add_edge("PL", "SCPS", weight=3)      # Pollak Library to State College Parking Structure
     G.add_edge("PL", "B", weight=3)          # Pollak Library to Becker Amphitheater
-    G.add_edge("PL", "I", weight=4)          # Pollak Library to Information Technology Building
+    G.add_edge("PL", "I", weight=4)          # Pollak Library to Parking Lot 1
     G.add_edge("PL", "EC", weight=3)        # Pollak Library to Education Classroom Building
     G.add_edge("PL", "VA", weight=5)         # Pollak Library to Visual Arts Building
-    G.add_edge("PL", "TG", weight=4)         # Pollak Library to Tuffy Lawn
+    G.add_edge("PL", "TG", weight=4)         # Pollak Library to Titan Gym
     G.add_edge("PL", "SHCC", weight=4)       # Pollak Library to Student Health and Counseling Center
     G.add_edge("PL", "GAS", weight=6)        # Pollak Library to Gas
     G.add_edge("PL", "GC", weight=4)         # Pollak Library to Green House
     G.add_edge("PL", "DBH", weight=3)        # Pollak Library to Dan Black Hall
-    G.add_edge("PL", "F", weight=5)          # Pollak Library to Fitness Center
+    G.add_edge("PL", "F", weight=5)          # Pollak Library to Parking Lot 2
 
     # Additional connections between adjacent buildings
     G.add_edge("TSU", "MH", weight=3)
