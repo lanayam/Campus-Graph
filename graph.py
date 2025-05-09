@@ -26,8 +26,8 @@ def campus_graph():
         "VA": "Visual Arts Building",
         "TG": "Tuffy Lawn",
         "SHCC": "Student Health and Counseling Center",
-        "GAS": "Golf Course",
-        "GC": "Golf Course",
+        "GAS": "Gas Station",
+        "GC": "Green House Complex",
         "DBH": "Dan Black Hall",
         "F": "Fitness Center"
     }
@@ -50,8 +50,8 @@ def campus_graph():
     G.add_edge("PL", "VA", weight=5)         # Pollak Library to Visual Arts Building
     G.add_edge("PL", "TG", weight=4)         # Pollak Library to Tuffy Lawn
     G.add_edge("PL", "SHCC", weight=4)       # Pollak Library to Student Health and Counseling Center
-    G.add_edge("PL", "GAS", weight=6)        # Pollak Library to Golf Course
-    G.add_edge("PL", "GC", weight=4)         # Pollak Library to Golf Course
+    G.add_edge("PL", "GAS", weight=6)        # Pollak Library to Gas
+    G.add_edge("PL", "GC", weight=4)         # Pollak Library to Green House
     G.add_edge("PL", "DBH", weight=3)        # Pollak Library to Dan Black Hall
     G.add_edge("PL", "F", weight=5)          # Pollak Library to Fitness Center
 
